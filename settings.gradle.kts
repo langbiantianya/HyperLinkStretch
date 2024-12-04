@@ -1,4 +1,4 @@
-rootProject.name = "LinkHorizon"
+rootProject.name = "HyperLinkStretch"
 
 
 dependencyResolutionManagement {

@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js">
+
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.11/clipboard.min.js"></script>
+    <script type="module" src="https://unpkg.com/@fluentui/web-components">
+    </script>
+    <title>HyperLinkStretch</title>
+    <style>
+        .content {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-content: center;
+            align-items: center;
+            width: 100%;
+            height: 95vh;
+        }
+
+        .input {
+            width: 100%;
+            display: flex;
+            align-content: center;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .input_area {
+            max-height: 2.5rem;
+            max-width: 40rem;
+            min-width: 13rem;
+            flex: 5;
+            margin-bottom: 0.5rem;
+        }
+
+        .input_button {
+            height: 2.5rem;
+            flex: 1;
+            max-width: 5rem;
+            min-width: 3rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .result {
+            width: 100%;
+        }
+
+        .result_card {
+            margin: 0 auto;
+            max-width: 46rem;
+            min-width: 13rem;
+            padding: 0.5rem;
+        }
+
+        .result_qr img {
+            width: 100%;
+            height: auto;
+        }
+
+        .result_qr {
+            width: min(90svw, 90svh);
+            height: min(90svw, 90svh);
+            padding: 1rem;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .result_link {
+            flex: 5;
+            max-width: 100%;
+            max-height: 10rem;
+            padding-left: 1rem;
+            overflow-y: scroll;
+        }
+
+        .result_link_url {
+            word-wrap: break-word;
+        }
+
+        .result_button {
+            flex: 3;
+            position: relative;
+            right: 0.5rem;
+            text-align: right;
+            height: 2rem;
+            min-width: 10rem;
+            /* white-space: nowrap; */
+        }
+
+        .result_tool {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            padding-bottom: 0.5rem;
+        }
+
+        a {
+            display: inline-block;
+            padding: 10px 20px;
+            color: #000;
+            text-decoration: none;
+            transition: 0.3s ease;
+        }
+
+        a:hover {
+            color: #0473ce;
+            text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #000, 1px 1px 0 #000;
+        }
+
+        @media (max-width: 41rem) {
+            .content {
+                height: auto;
+            }
+
+            .result_link {
+                max-height: 100%;
+                overflow-y: auto;
+            }
+
+            .result_tool {
+                justify-content: center;
+            }
+
+            #show_qr {
+                display: none;
+            }
+
+            #copy_result_link_url {
+                width: 100%;
+                margin-left: 0.5rem;
+            }
+
+            .skeleton {
+                display: none;
+            }
+
+            .result_button {
+                text-align: center;
+                max-height: 100%;
+                flex: 1 0 100%;
+            }
+
+            .input_area {
+                max-height: 100%;
+                min-height: 2.5rem;
+            }
+
+            .result_link {
+                max-width: 40rem;
+                min-width: 13rem;
+                flex: 1 0 100%;
+            }
+
+            .input_button {
+                max-width: 40rem;
+                min-width: 13rem;
+                flex: 1 0 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <script type="text/javascript">
+        async function generate(url) {
+            const response = await fetch(`/api/v1/generate?url=${url}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            const result = await response.json()
+            console.log(result)
+            // 获取当前页面的完整 URL
+            var currentUrl = window.location.href;
+            // 使用 URL 对象来解析 URL
+            var url = new URL(currentUrl);
+
+            // 从 URL 对象中提取主机名
+            var host = url.hostname;
+            // 打印主机名
+            const longUrl = `${window.location.protocol}//${host}:${window.location.port}${result.targetURL}`
+            document.getElementById("result_link_url").innerText = longUrl
+            new QRCode(document.getElementById("qrcode"), {
+                text: longUrl,
+                width: 2048,
+                height: 2048,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+            document.getElementById("result").hidden = false;
+            document.getElementById("copy_result_link_url").setAttribute("data-clipboard-text", longUrl)
+        }
+        window.onload = () => {
+            document.getElementById("content").addEventListener("click", (event) => {
+                const url = document.getElementById("qrcode").hidden = true
+            })
+            document.getElementById("show_qr").addEventListener("click", (event) => {
+                event.stopPropagation()
+                const url = document.getElementById("qrcode").hidden = false
+            })
+            document.getElementById("qrcode").addEventListener("click", (event) => {
+                const url = document.getElementById("qrcode").hidden = true
+            })
+            document.getElementById("input_button").addEventListener("click", (event) => {
+                const url = document.getElementById("input_area").currentValue
+                generate(url)
+            })
+            var clipboard = new ClipboardJS('#copy_result_link_url');
+
+            clipboard.on('success', function (e) {
+                console.info('Action:', e.action);
+                console.info('Text:', e.text);
+                console.info('Trigger:', e.trigger);
+                window.alert("copy success")
+            });
+
+            clipboard.on('error', function (e) {
+                console.error('Action:', e.action);
+                console.error('Trigger:', e.trigger);
+                window.alert("copy error")
+            });
+        }
+    </script>
+    <div id="content" class="content">
+        <fluent-tooltip id="tooltip" anchor="anchor-default">
+            点击前往github仓库
+        </fluent-tooltip>
+        <h1 id="anchor-default" aria-describedby="tooltip"><a
+                href="https://github.com/langbiantianya/HyperLinkStretch">一个长链</a></h1>
+        <div class="input">
+            <fluent-text-area id="input_area" class="input_area"
+                placeholder="请输入包含”http://“或“https://”网址"></fluent-text-area>
+            <fluent-skeleton class="skeleton" style="width: 1rem;" shape="rect" shimmer="false"></fluent-skeleton>
+            <fluent-button id="input_button" class="input_button" appearance="accent">生成</fluent-button>
+        </div>
+
+        <div id="result" class="result" hidden>
+            <fluent-card class="result_card">
+                <div class="result_tool">
+                    <span style="line-height: 2rem; flex: 8;">该应用用于娱乐用途，请勿在生产上使用。</span>
+                    <div class="result_button">
+                        <fluent-button id="show_qr">二维码</fluent-button>
+                        <fluent-button id="copy_result_link_url" appearance="accent" data-clipboard-text=""
+                            data-clipboard-action="copy">复制链接</fluent-button>
+                    </div>
+                </div>
+
+                <div class="result_link">
+                    <span id="result_link_url" class="result_link_url"></span>
+                </div>
+        </div>
+        </fluent-card>
+    </div>
+    <div id="qrcode" class="result_qr"></div>
+</body>
+
+</html>
