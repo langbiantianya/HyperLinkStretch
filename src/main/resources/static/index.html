@@ -172,7 +172,16 @@
 
 <body>
     <script type="text/javascript">
+        function isValidUrl(url) {
+            try {
+                new URL(url);
+                return true;
+            } catch (_) {
+                return false;
+            }
+        }
         async function generate(url) {
+            isValidUrl(url) || window.alert("请输入正确的url")
             const response = await fetch(`/api/v1/generate?url=${url}`, {
                 method: 'GET',
                 headers: {
