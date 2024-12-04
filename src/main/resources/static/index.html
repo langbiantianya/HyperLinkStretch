@@ -189,8 +189,6 @@
                 }
             })
             const result = await response.json()
-            console.log(result)
-            // 获取当前页面的完整 URL
             var currentUrl = window.location.href;
             // 使用 URL 对象来解析 URL
             var url = new URL(currentUrl);
@@ -198,7 +196,7 @@
             // 从 URL 对象中提取主机名
             var host = url.hostname;
             // 打印主机名
-            const longUrl = `${window.location.protocol}//${host}:${window.location.port}${result.targetURL}`
+            const longUrl = `${window.location.protocol}//${host?":"+host:""}:${window.location.port}${result.targetURL}`
             document.getElementById("result_link_url").innerText = longUrl
             new QRCode(document.getElementById("qrcode"), {
                 text: longUrl,

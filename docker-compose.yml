@@ -6,7 +6,7 @@ services:
     volumes:
       - ./redis:/data
   hyper-link-stretch:
-    image: hyper-link-stretch:latest
+    image: lbty/hyper-link-stretch:latest
     restart: always
     ports:
       - 8080:8080
