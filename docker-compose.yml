@@ -16,6 +16,7 @@ services:
   hyper-link-stretch:
     image: lbty/hyper-link-stretch:latest
     restart: always
+    command: java -Xmx128m -Xms64m -jar HyperLinkStretch.jar
     ports:
       - "8080:8080"
     depends_on:
