@@ -2,7 +2,7 @@
 
 A demo developed using `Spring Reactive Web` and `Spring Data Reactive Redis`
 
-## 如何部署？(How to deploy?)
+## 如何部署？(how to deploy?)
 
 ```shell
 wget https://github.com/langbiantianya/HyperLinkStretch/raw/refs/heads/master/docker-compose.yml
