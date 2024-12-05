@@ -1,14 +1,25 @@
-FROM gradle:jdk21 AS build
+FROM gradle:jdk21 AS base
+
+WORKDIR /app
+
+COPY ./gradle .
+COPY ./build.gradle.kts .
+COPY ./gradlew .
+COPY ./gradlew.bat .
+COPY ./settings.gradle.kts .
+COPY ./init.gradle.kts ~/.gradle/init.gradle.kts
+
+ENV GRADLE_USER_HOME=~/.gradle
+
+RUN gradle --refresh-dependencies
+
+FROM base AS build
 
 WORKDIR /app
 
 COPY . .
 
-ENV GRADLE_USER_HOME=~/.gradle
-
-COPY ./init.gradle.kts ~/.gradle/init.gradle.kts
-
-RUN gradle :jar
+RUN gradle build
 
 FROM eclipse-temurin:21-jre-alpine AS runner
 
