@@ -1,14 +1,27 @@
-version: "1.0"
 services:
   redis:
     image: redis:latest
     restart: always
     volumes:
       - ./redis:/data
+    deploy:
+      resources:
+        limits:
+          cpus: 0.1
+          memory: 64M
+    environment:
+      - REDIS_APPENDONLY=yes
+      - REDIS_APPENDFSYNC=everysec
+    command: redis-server --appendonly yes --appendfsync everysec
   hyper-link-stretch:
     image: lbty/hyper-link-stretch:latest
     restart: always
     ports:
-      - 8080:8080
+      - "8080:8080"
     depends_on:
       - redis
+    deploy:
+      resources:
+        limits:
+          cpus: 0.2
+          memory: 128M
