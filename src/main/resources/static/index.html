@@ -171,106 +171,109 @@
 </head>
 
 <body>
-    <script type="text/javascript">
-        function isValidUrl(url) {
-            try {
-                new URL(url);
-                return true;
-            } catch (_) {
-                return false;
+<script type="text/javascript">
+    function isValidUrl(url) {
+        try {
+            new URL(url);
+            return true;
+        } catch (_) {
+            return false;
+        }
+    }
+
+    async function generate(url) {
+        isValidUrl(url) || window.alert("请输入正确的url")
+        const response = await fetch(`/api/v1/generate?url=${url}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
             }
-        }
-        async function generate(url) {
-            isValidUrl(url) || window.alert("请输入正确的url")
-            const response = await fetch(`/api/v1/generate?url=${url}`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                }
-            })
-            const result = await response.json()
-            var currentUrl = window.location.href;
-            // 使用 URL 对象来解析 URL
-            var url = new URL(currentUrl);
+        })
+        const result = await response.json()
+        var currentUrl = window.location.href;
+        // 使用 URL 对象来解析 URL
+        var url = new URL(currentUrl);
 
-            // 从 URL 对象中提取主机名
-            var host = url.hostname;
-            // 打印主机名
-            const longUrl = `${window.location.protocol}//${host?":"+host:""}:${window.location.port}${result.targetURL}`
-            document.getElementById("result_link_url").innerText = longUrl
-            new QRCode(document.getElementById("qrcode"), {
-                text: longUrl,
-                width: 2048,
-                height: 2048,
-                colorDark: "#000000",
-                colorLight: "#ffffff",
-                correctLevel: QRCode.CorrectLevel.H
-            });
-            document.getElementById("result").hidden = false;
-            document.getElementById("copy_result_link_url").setAttribute("data-clipboard-text", longUrl)
-        }
-        window.onload = () => {
-            document.getElementById("content").addEventListener("click", (event) => {
-                const url = document.getElementById("qrcode").hidden = true
-            })
-            document.getElementById("show_qr").addEventListener("click", (event) => {
-                event.stopPropagation()
-                const url = document.getElementById("qrcode").hidden = false
-            })
-            document.getElementById("qrcode").addEventListener("click", (event) => {
-                const url = document.getElementById("qrcode").hidden = true
-            })
-            document.getElementById("input_button").addEventListener("click", (event) => {
-                const url = document.getElementById("input_area").currentValue
-                generate(url)
-            })
-            var clipboard = new ClipboardJS('#copy_result_link_url');
+        // 从 URL 对象中提取主机名
+        var host = url.hostname;
+        // 打印主机名
+        const longUrl = `${window.location.protocol}//${host}${window.location.port ? ":" + window.location.port : ""}${result.targetURL}`
+        document.getElementById("result_link_url").innerText = longUrl
+        new QRCode(document.getElementById("qrcode"), {
+            text: longUrl,
+            width: 2048,
+            height: 2048,
+            colorDark: "#000000",
+            colorLight: "#ffffff",
+            correctLevel: QRCode.CorrectLevel.H
+        });
+        document.getElementById("result").hidden = false;
+        document.getElementById("copy_result_link_url").setAttribute("data-clipboard-text", longUrl)
+    }
 
-            clipboard.on('success', function (e) {
-                console.info('Action:', e.action);
-                console.info('Text:', e.text);
-                console.info('Trigger:', e.trigger);
-                window.alert("copy success")
-            });
+    window.onload = () => {
+        document.getElementById("content").addEventListener("click", (event) => {
+            const url = document.getElementById("qrcode").hidden = true
+        })
+        document.getElementById("show_qr").addEventListener("click", (event) => {
+            event.stopPropagation()
+            const url = document.getElementById("qrcode").hidden = false
+        })
+        document.getElementById("qrcode").addEventListener("click", (event) => {
+            const url = document.getElementById("qrcode").hidden = true
+        })
+        document.getElementById("input_button").addEventListener("click", (event) => {
+            const url = document.getElementById("input_area").currentValue
+            generate(url)
+        })
+        var clipboard = new ClipboardJS('#copy_result_link_url');
 
-            clipboard.on('error', function (e) {
-                console.error('Action:', e.action);
-                console.error('Trigger:', e.trigger);
-                window.alert("copy error")
-            });
-        }
-    </script>
-    <div id="content" class="content">
-        <fluent-tooltip id="tooltip" anchor="anchor-default">
-            点击前往github仓库
-        </fluent-tooltip>
-        <h1 id="anchor-default" aria-describedby="tooltip"><a
-                href="https://github.com/langbiantianya/HyperLinkStretch">一个长链</a></h1>
-        <div class="input">
-            <fluent-text-area id="input_area" class="input_area"
-                placeholder="请输入包含”http://“或“https://”网址"></fluent-text-area>
-            <fluent-skeleton class="skeleton" style="width: 1rem;" shape="rect" shimmer="false"></fluent-skeleton>
-            <fluent-button id="input_button" class="input_button" appearance="accent">生成</fluent-button>
-        </div>
+        clipboard.on('success', function (e) {
+            console.info('Action:', e.action);
+            console.info('Text:', e.text);
+            console.info('Trigger:', e.trigger);
+            window.alert("copy success")
+        });
 
-        <div id="result" class="result" hidden>
-            <fluent-card class="result_card">
-                <div class="result_tool">
-                    <span style="line-height: 2rem; flex: 8;">该应用用于娱乐用途，请勿在生产上使用。</span>
-                    <div class="result_button">
-                        <fluent-button id="show_qr">二维码</fluent-button>
-                        <fluent-button id="copy_result_link_url" appearance="accent" data-clipboard-text=""
-                            data-clipboard-action="copy">复制链接</fluent-button>
-                    </div>
-                </div>
-
-                <div class="result_link">
-                    <span id="result_link_url" class="result_link_url"></span>
-                </div>
-        </div>
-        </fluent-card>
+        clipboard.on('error', function (e) {
+            console.error('Action:', e.action);
+            console.error('Trigger:', e.trigger);
+            window.alert("copy error")
+        });
+    }
+</script>
+<div id="content" class="content">
+    <fluent-tooltip id="tooltip" anchor="anchor-default">
+        点击前往github仓库
+    </fluent-tooltip>
+    <h1 id="anchor-default" aria-describedby="tooltip"><a
+            href="https://github.com/langbiantianya/HyperLinkStretch">一个长链</a></h1>
+    <div class="input">
+        <fluent-text-area id="input_area" class="input_area"
+                          placeholder="请输入包含”http://“或“https://”网址"></fluent-text-area>
+        <fluent-skeleton class="skeleton" style="width: 1rem;" shape="rect" shimmer="false"></fluent-skeleton>
+        <fluent-button id="input_button" class="input_button" appearance="accent">生成</fluent-button>
     </div>
-    <div id="qrcode" class="result_qr"></div>
+
+    <div id="result" class="result" hidden>
+        <fluent-card class="result_card">
+            <div class="result_tool">
+                <span style="line-height: 2rem; flex: 8;">该应用用于娱乐用途，请勿在生产上使用。</span>
+                <div class="result_button">
+                    <fluent-button id="show_qr">二维码</fluent-button>
+                    <fluent-button id="copy_result_link_url" appearance="accent" data-clipboard-text=""
+                                   data-clipboard-action="copy">复制链接
+                    </fluent-button>
+                </div>
+            </div>
+
+            <div class="result_link">
+                <span id="result_link_url" class="result_link_url"></span>
+            </div>
+    </div>
+    </fluent-card>
+</div>
+<div id="qrcode" class="result_qr"></div>
 </body>
 
 </html>
