@@ -15,6 +15,8 @@ services:
     command: redis-server --appendonly yes --appendfsync everysec
   hyper-link-stretch:
     image: lbty/hyper-link-stretch:latest
+    #机器内存比较小可以使用下面这个
+    #image:lbty/hyper-link-stretch:ibm-semeru
     restart: always
     command: java -Xmx128m -Xms64m -jar HyperLinkStretch.jar
     ports:
